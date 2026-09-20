@@ -35,92 +35,44 @@ no changes added to commit (use "git add" and/or "git commit -a")
 Gogie Malathu@WINDOWS-UOQCCU3 MINGW64 ~/Documents/AnalyticsProjects/pg_demo_airline_1y_booking (main)
 $ git add demo_airline_sql.sql
 
-#check the state of your project
-Gogie Malathu@WINDOWS-UOQCCU3 MINGW64 ~/git-practice (master)
+Gogie Malathu@WINDOWS-UOQCCU3 MINGW64 ~/Documents/AnalyticsProjects/pg_demo_airline_1y_booking (main)
 $ git status
-On branch master
-
-No commits yet
-
-nothing to commit (create/copy files and use "git add" to track)
-
-#Create a file to apply versioning to > 'README.md'
-Gogie Malathu@WINDOWS-UOQCCU3 MINGW64 ~/git-practice (master)
-$ echo "# My First Git Project" > README.md
-
-Gogie Malathu@WINDOWS-UOQCCU3 MINGW64 ~/git-practice (master)
-$ git status
-On branch master
-
-No commits yet
-
-Untracked files:
-  (use "git add <file>..." to include in what will be committed)
-        README.md
-
-nothing added to commit but untracked files present (use "git add" to track)
-
-#Move README.md from untracked to staging w/ 'git add'
-Gogie Malathu@WINDOWS-UOQCCU3 MINGW64 ~/git-practice (master)
-$ git add README.md
-warning: in the working copy of 'README.md', LF will be replaced by CRLF the next time Git touches it
-
-Gogie Malathu@WINDOWS-UOQCCU3 MINGW64 ~/git-practice (master)
-$ git status
-On branch master
-
-No commits yet
+On branch main
+Your branch is up to date with 'origin/main'.
 
 Changes to be committed:
-  (use "git rm --cached <file>..." to unstage)
-        new file:   README.md
+  (use "git restore --staged <file>..." to unstage)
+        modified:   demo_airline_sql.sql
 
-#Commit to repo with clear message describing the change
-Gogie Malathu@WINDOWS-UOQCCU3 MINGW64 ~/git-practice (master)
-$ git commit -m "Initial commit: ADD README file"
-[master (root-commit) 34362a5] Initial commit: ADD README file
- 1 file changed, 1 insertion(+)
- create mode 100644 README.md
-
-#Write output (New Line) to README.md (Make a change)
-Gogie Malathu@WINDOWS-UOQCCU3 MINGW64 ~/git-practice (master)
-$ echo "Learning Phase 1 of Git" > README.md
-
-Gogie Malathu@WINDOWS-UOQCCU3 MINGW64 ~/git-practice (master)
-$ git status
-On branch master
 Changes not staged for commit:
   (use "git add <file>..." to update what will be committed)
   (use "git restore <file>..." to discard changes in working directory)
-        modified:   README.md
+        modified:   pg airline 1y data workpapers.xlsx
 
-no changes added to commit (use "git add" and/or "git commit -a")
-
-#Move changes made to README.md to staging w/ 'git add'
-Gogie Malathu@WINDOWS-UOQCCU3 MINGW64 ~/git-practice (master)
-$ git add README.md
-warning: in the working copy of 'README.md', LF will be replaced by CRLF the next time Git touches it
-
-#Commit change to README.md in git
-Gogie Malathu@WINDOWS-UOQCCU3 MINGW64 ~/git-practice (master)
-$ git commit -m "Update README with learning goals"
-[master da2f7e5] Update README with learning goals
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+        Airline Data Analytics - Gemini.gdoc
+        ERD diagram postgres demo bookings.png
+        git-bash commands demo_2y 20260920.ps1
+Gogie Malathu@WINDOWS-UOQCCU3 MINGW64 ~/Documents/AnalyticsProjects/pg_demo_airline_1y_booking (main)
+$ git commit -m "SQL script updated since original upload. Added derived columns to routes."
+[main 2db7c1d] SQL script updated since original upload. Added derived columns to routes.
+ 1 file changed, 205 insertions(+), 47 deletions(-)
 
 #Review projects' historical timeline (2 commits w/ hash IDs)
-Gogie Malathu@WINDOWS-UOQCCU3 MINGW64 ~/git-practice (master)
+Gogie Malathu@WINDOWS-UOQCCU3 MINGW64 ~/Documents/AnalyticsProjects/pg_demo_airline_1y_booking (main)
 $ git log --oneline
-da2f7e5 (HEAD -> master) Update README with learning goals
-34362a5 Initial commit: ADD README file
+2db7c1d (HEAD -> main) SQL script updated since original upload. Added derived columns to routes.
+f753003 (origin/main) Initial commit to PG Aviation Demo Database Analytics project folder
 
-Gogie Malathu@WINDOWS-UOQCCU3 MINGW64 ~/git-practice (master)
-$ cat README.md
-Learning Phase 1 of Git
+#Add multiple files to github repository
+Gogie Malathu@WINDOWS-UOQCCU3 MINGW64 ~/Documents/AnalyticsProjects/pg_demo_airline_1y_booking (main)
+$ git add "git-bash commands demo_2y 20260920.ps1" demo_airline_sql.sql "pg airline 1y data workpapers.xlsx" "ERD diagram postgres demo bookings.png"
 
 #Phase 2: Connecting to GitHub & Branching
 #Ignore these lines in PS buffer (need to update path)
 Gogie Malathu@WINDOWS-UOQCCU3 MINGW64 ~/git-practice (master)
-$ ggit remote add origin https://github.com/YOUR-USERNAME/git-practice.git
+$ git remote add origin https://github.com/gmalathu/PostgresPro-Aviation-DemoDB-Analytics.git
 git branch -M main
 git push -u origin main
 bash: $'\302\226git': command not found
