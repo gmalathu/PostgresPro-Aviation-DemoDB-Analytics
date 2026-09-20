@@ -19,29 +19,33 @@ timetable		14
 
 */
 
--- Get row counts all tables
+-- Get row counts all tables in 'demo_1y'
 
-SELECT 'airplanes_data' as table, count(*) as row_count FROM airplanes_data
+select * FROM
+(SELECT 'airplanes_data' as table_name, count(*) as row_count FROM demo.bookings.airplanes_data
 UNION ALL
-SELECT 'airports_data' as table, count(*) as row_count FROM airports_data
+SELECT 'airports_data' as table_name, count(*) as row_count FROM demo.bookings.airports_data
 UNION ALL
-SELECT 'boarding_passes' as table, count(*) as row_count FROM boarding_passes
+SELECT 'boarding_passes' as table_name, count(*) as row_count FROM demo.bookings.boarding_passes
 UNION ALL
-SELECT 'bookings' as table, count(*) as row_count FROM bookings
+SELECT 'bookings' as table_name, count(*) as row_count FROM demo.bookings.bookings
 UNION ALL
-SELECT 'flights' as table, count(*) as row_count FROM flights
+SELECT 'flights' as table_name, count(*) as row_count FROM demo.bookings.flights
 UNION ALL
-SELECT 'routes' as table, count(*) as row_count FROM routes
+SELECT 'routes' as table_name, count(*) as row_count FROM demo.bookings.routes
 UNION ALL
-SELECT 'seats' as table, count(*) as row_count FROM seats
+SELECT 'seats' as table_name, count(*) as row_count FROM demo.bookings.seats
 UNION ALL
-SELECT 'segments' as table, count(*) as row_count FROM segments
+SELECT 'segments' as table_name, count(*) as row_count FROM demo.bookings.segments
 UNION ALL
-SELECT 'tickets' as table, count(*) as row_count FROM tickets
+SELECT 'tickets' as table_name, count(*) as row_count FROM demo.bookings.tickets
 UNION ALL
-SELECT 'timetable' as table, count(*) as row_count FROM timetable;
+SELECT 'timetable' as table_name, count(*) as row_count FROM demo.bookings.timetable) a
+order by table_name
+;
 
 /*
+demo_1y
 table				row_count
 airplanes_data		10
 airports_data		5,501
@@ -53,7 +57,46 @@ seats				1,741
 segments			14,210,428
 tickets				10,836,563
 timetable			69,710
+*/
 
+-- Get row counts all tables in 'demo_2y'
+
+select * FROM
+(SELECT 'airplanes_data' as table_name, count(*) as row_count FROM demo_2y.bookings.airplanes_data
+UNION ALL
+SELECT 'airports_data' as table_name, count(*) as row_count FROM demo_2y.bookings.airports_data
+UNION ALL
+SELECT 'boarding_passes' as table_name, count(*) as row_count FROM demo_2y.bookings.boarding_passes
+UNION ALL
+SELECT 'bookings' as table_name, count(*) as row_count FROM demo_2y.bookings.bookings
+UNION ALL
+SELECT 'flights' as table_name, count(*) as row_count FROM demo_2y.bookings.flights
+UNION ALL
+SELECT 'routes' as table_name, count(*) as row_count FROM demo_2y.bookings.routes
+UNION ALL
+SELECT 'seats' as table_name, count(*) as row_count FROM demo_2y.bookings.seats
+UNION ALL
+SELECT 'segments' as table_name, count(*) as row_count FROM demo_2y.bookings.segments
+UNION ALL
+SELECT 'tickets' as table_name, count(*) as row_count FROM demo_2y.bookings.tickets
+UNION ALL
+SELECT 'timetable' as table_name, count(*) as row_count FROM demo_2y.bookings.timetable) a
+order by table_name
+;
+
+/*
+demo_2y
+table_name			row_count
+airplanes_data		10
+airports_data		5,501
+boarding_passes		26,299,160
+bookings			9,706,657
+flights				135,571
+routes				7,242
+seats				1,741
+segments			27,580,257
+tickets				21,095,265
+timetable			135,571
 
 */
 
@@ -110,14 +153,16 @@ Generate your output in the form of SQL queries written using correct postgresql
 */
 
 -- Question 1: Min/Max booking date
+-- @4:13 PM Friday, September 11, 2026, Use 'demo_2y' data
+
 SELECT
     MIN(DATE_TRUNC('month', book_date)::date) AS earliest_booking_date,
     MAX(DATE_TRUNC('month', book_date)::date) AS most_recent_booking_date
-FROM bookings;
+FROM demo_2y.bookings.bookings;
 
 /*
-earliest_booking_date			most_recent_booking_date
-2025-08-31 19:00:06.265 -0500	2026-08-31 18:59:58.283 -0500
+earliest_booking_date	most_recent_booking_date
+2025-08-01				2027-08-01
 
 8/31/25 to 8/31/26
 
@@ -128,7 +173,7 @@ SELECT
     EXTRACT(YEAR FROM book_date)  AS booking_year,
     EXTRACT(MONTH FROM book_date) AS booking_month,
     COUNT(book_ref)            AS booking_count
-FROM bookings
+FROM demo_2y.bookings.bookings
 GROUP BY
     EXTRACT(YEAR FROM book_date),
     EXTRACT(MONTH FROM book_date)
@@ -140,8 +185,8 @@ ORDER BY
 
 SELECT
     DATE_TRUNC('month', book_date)::date AS booking_month,
-    COUNT(booking_ref)                   AS booking_count
-FROM bookings
+    COUNT(book_ref)                   AS booking_count
+FROM demo_2y.bookings.bookings
 GROUP BY DATE_TRUNC('month', book_date)
 ORDER BY booking_month;
 
@@ -152,8 +197,8 @@ WITH booking_ticket_counts AS (
         b.book_ref,
         b.book_date,
         COUNT(t.ticket_no) AS ticket_count
-    FROM bookings b
-    JOIN tickets t
+    FROM demo_2y.bookings.bookings b
+    JOIN demo_2y.bookings.tickets t
         ON t.book_ref = b.book_ref
     GROUP BY
         b.book_ref,
@@ -173,14 +218,16 @@ ORDER BY
     booking_month;
 
 -- OR Alternatively (for group by DATE_TRUNC(book_date) as booking_month)
+DROP TABLE IF EXISTS demo_2y.bookings.booking_1_plus_tkt;
+CREATE TABLE demo_2y.bookings.booking_1_plus_tkt AS
 
 WITH booking_ticket_counts AS (
     SELECT
         b.book_ref,
         DATE_TRUNC('month', b.book_date)::date AS booking_month,
         COUNT(t.ticket_no) AS ticket_count
-    FROM bookings b
-    JOIN tickets t
+    FROM demo_2y.bookings.bookings b
+    JOIN demo_2y.bookings.tickets t
         ON t.book_ref = b.book_ref -- b:t > 1:Many
     GROUP BY
         b.book_ref,
@@ -191,18 +238,22 @@ SELECT
     COUNT(*) AS bookings_with_2plus_tickets
 FROM booking_ticket_counts
 WHERE ticket_count >= 2
-GROUP BY booking_month
-ORDER BY booking_month;
+GROUP BY booking_month;
+-- ORDER BY booking_month
+
 
 -- Question 3b: # of booking for 1 ticket by monthy/year.
+
+DROP TABLE IF EXISTS demo_2y.bookings.booking_1tkt;
+CREATE TABLE demo_2y.bookings.booking_1tkt AS
 
 WITH booking_ticket_counts AS (
     SELECT
         b.book_ref,
         DATE_TRUNC('month', b.book_date)::date AS booking_month,
         COUNT(t.ticket_no) AS ticket_count
-    FROM bookings b
-    JOIN tickets t
+    FROM demo_2y.bookings.bookings b
+    JOIN demo_2y.bookings.tickets t
         ON t.book_ref = b.book_ref -- b:t > 1:Many
     GROUP BY
         b.book_ref,
@@ -213,25 +264,54 @@ SELECT
     COUNT(*) AS bookings_with_1_ticket
 FROM booking_ticket_counts
 WHERE ticket_count < 2
-GROUP BY booking_month
-ORDER BY booking_month;
+GROUP BY booking_month;
+-- ORDER BY booking_month;
 
 -- Validate Total # of tickets purchased
-select count(*) from tickets; -- 10,836,563 total tickets (OK)
 
 -- Total tickets for bookings w/ 2 or more vs. single ticket bookings.
 
 WITH booking_ticket_counts AS (
     SELECT
-        book_ref,
-        COUNT(*) AS ticket_count
-    FROM tickets
-    GROUP BY book_ref
-    HAVING COUNT(*) >= 2
+		book_ref,
+		ticket_no
+    FROM demo_2y.bookings.tickets
+    GROUP BY 1,2
 )
-SELECT
-    SUM(ticket_count) AS total_tickets_in_bookings_with_2plus_tickets
-FROM booking_ticket_counts;
+
+select 'bookings_1plus_tickets' as booking_type
+,sum(count_tix) as count_tix
+
+from
+
+(select book_ref
+,count(ticket_no) as count_tix
+
+from booking_ticket_counts
+group by 1
+having count(ticket_no) > 1) a
+
+UNION ALL
+
+select 'bookings_1ticket' as booking_type
+,sum(count_tix) as count_tix
+
+from
+
+(select book_ref
+,count(ticket_no) as count_tix
+
+from booking_ticket_counts
+group by 1
+having count(ticket_no) = 1) a
+
+/*
+
+booking_type			count_tix
+bookings_1plus_tickets	18,259,197
+bookings_1ticket		2,836,068
+
+*/
 
 -- Quick Validation: Is flight_id:route_no 1:1 or 1:Many or Many:1
 -- Note: Timetable rows are unique by flight_id
@@ -239,34 +319,34 @@ FROM booking_ticket_counts;
 select count(*)
 from
 (select flight_id
-from timetable
 group by 1) a
-; -- 69710 total rows/flights
+; -- 135,571 total rows/flights
 
 select count(*)
 from
 (select route_no
-from timetable
+from demo_2y.bookings.timetable
 group by 1) a
-; -- 1322 total routes in timetable.
+; 
+-- 1798 total routes in timetable. The timetable for flights reflects only those routes the flights currently serve for this 2 year period.
 
 -- Compare to # of routes in routes table.
 
 select count(*)
 from
 (select route_no
-from routes
+from demo_2y.bookings.routes
 group by 1) a
-; -- 1322 unique routes in routes AND in table: timetable
+; -- 1798 unique routes in routes AND in table: timetable (routes table includes ALL routes in the timetable)
 
-select count(*) from routes; -- 3770 total rows
+select count(*) from demo_2y.bookings.routes; -- 7,242 total rows
 
 select count(*)
 from
 (select route_no, validity
-from routes
+from demo_2y.bookings.routes
 group by 1,2) a
-; -- 3770 total rows
+; -- 7,242 total rows, reflects routes and their associated validity (date range route is in service)
 
 -- Get random sample of 20 route_no w/ 2 or more unique values for validity...
 
@@ -279,17 +359,95 @@ from
 (select route_no
 ,validity
 
-from routes
+from demo_2y.bookings.routes
 group by 1,2) a
 group by 1
 having count(validity) > 1
 order by random()
 limit 20) as a
 
-left join routes as b on a.route_no = b.route_no
+left join demo_2y.bookings.routes as b on a.route_no = b.route_no
 order by b.route_no, b.validity, b.scheduled_time
 ;
 
+
+/*
+
+You are an expert postgresql SQL developer. Write the SQL query in postgresql syntax that creates a table derived from 'routes' that includes these 4 additional columns and call it 'routes_ext'
+
+These additional columns should be populated as follows. First column calculates # of days/months indicated in 'validity' and populates column 'days_gap'. 2nd column should derive its value based on sorting the routes table by route_no and validity and be named 'suspend_start' and will be populated with the day after the previous validity period ends. Then 3rd column named 'suspend_end' will be populated with the day before the following validity period starts.
+
+For example, refer to routes tab w/ 20 row sample of route_no's w/ > 1 row for validity with column datatype format 'tstzrange — Range of timestamp with time zone'... Route 'PG0244' with validity value of '["2025-10-31 19:00:00-05","2025-11-30 18:00:00-06")' is contiguous with previous period '["2025-09-30 19:00:00-05","2025-10-31 19:00:00-05")'. Add a 4th column called 'contiguous_ind' and populate 1 if row value for validity is contiguous with the previous row value in tstzrange format and 0 if there is a gap. If 'contiguous_ind' is 0 then 'suspend_start' and 'suspend_end' should be blank or null, and if the value is 1 then 'suspend_start' and 'suspend_end' should always be populated with the associated tstz value in date/time/timezone format.
+
+Write the SQL query in postgresql syntax that creates a table derived from 'routes' that includes these 3 additional columns and call it 'routes_ext'
+
+*/
+
+BEGIN;
+DROP TABLE IF EXISTS demo_2y.bookings.routes_ext;
+CREATE TABLE demo_2y.bookings.routes_ext AS
+WITH ordered_routes AS
+(
+    SELECT
+        r.*,
+
+        LAG(validity) OVER
+        (
+            PARTITION BY route_no
+            ORDER BY lower(validity)
+        ) AS prev_validity,
+
+        LEAD(validity) OVER
+        (
+            PARTITION BY route_no
+            ORDER BY lower(validity)
+        ) AS next_validity
+
+    FROM demo_2y.bookings.routes r
+)
+SELECT
+    o.*,
+
+    /* Length of validity period in days */
+    EXTRACT(EPOCH FROM (upper(o.validity) - lower(o.validity))) / 86400.0
+        AS days_gap,
+
+    /* Contiguous with previous validity period */
+    CASE
+        WHEN o.prev_validity IS NOT NULL
+         AND lower(o.validity) = upper(o.prev_validity)
+        THEN 1
+        ELSE 0
+    END AS contiguous_ind,
+
+    /* Day after previous validity period ends */
+    CASE
+        WHEN o.prev_validity IS NOT NULL
+         AND lower(o.validity) = upper(o.prev_validity)
+        THEN upper(o.prev_validity) + INTERVAL '1 day'
+        ELSE NULL
+    END AS suspend_start,
+
+    /* Day before current validity period starts */
+    CASE
+        WHEN o.prev_validity IS NOT NULL
+         AND lower(o.validity) = upper(o.prev_validity)
+        THEN lower(o.validity) - INTERVAL '1 day'
+        ELSE NULL
+    END AS suspend_end
+
+FROM ordered_routes o;
+COMMIT;
+
+select * from demo_2y.bookings.routes_ext;
+
+-- Get sample to validate column logic was applied correctly.
+
+select b.*
+
+from
+
+(select )
 
 /*
 Exploratory data analysis questions (continued):
